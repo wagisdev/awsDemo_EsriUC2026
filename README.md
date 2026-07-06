@@ -59,3 +59,4 @@ step by step in **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**.
 - [docs/diagrams/architecture.md](docs/diagrams/architecture.md) — diagrams
 - [docs/adr/](docs/adr/) — architecture decision records
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — deploy runbook + manual config values
+- [docs/COST-ESTIMATE.md](docs/COST-ESTIMATE.md) — monthly cost estimate (AWS + ArcGIS) for up to 30K users
