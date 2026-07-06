@@ -1,0 +1,275 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&display=swap");
+
+/* ------------------------------------------------------------------ *
+ * Pormanes.NET design tokens — frosted glass / high-tech map theme.
+ * Mirrors the look & feel of https://pormanes.net.
+ * ------------------------------------------------------------------ */
+:root {
+  --bg-color: #0d0f14;
+  --panel-bg: rgba(255, 255, 255, 0.03);
+  --panel-bg-solid: rgba(13, 15, 20, 0.72);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --accent-cyan: #00e5ff;
+  --accent-blue: #0ea5e9;
+  --accent-emerald: #34d399;
+  --danger: #f87171;
+  --warning: #fbbf24;
+  --glass-blur: blur(14px);
+  --radius-lg: 1.25rem;
+  --radius-md: 0.85rem;
+  --radius-sm: 0.55rem;
+  --header-height: 84px;
+  --shadow-glow: 0 0 40px rgba(0, 229, 255, 0.08),
+    inset 0 0 20px rgba(255, 255, 255, 0.03);
+
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ *
+ * ArcGIS map-components (Calcite) theming.
+ *
+ * The `calcite-mode-dark` class (on <body>) pulls in Calcite's COMPLETE dark
+ * token set from the ArcGIS dark theme — without it, complex components like
+ * the feature table fall back to light mode and render white. On top of that
+ * baseline we retint the key surfaces to the app's frosted navy/cyan palette so
+ * the components read as native, not bolted-on. Set on `body` so the tokens
+ * also reach Calcite menus/tooltips that portal out to the document body.
+ * ------------------------------------------------------------------ */
+body.calcite-mode-dark {
+  /* Brand → app cyan */
+  --calcite-color-brand: var(--accent-cyan);
+  --calcite-color-brand-hover: #5cf0ff;
+  --calcite-color-brand-press: var(--accent-blue);
+
+  /* Surfaces: translucent navy so the frosted panels show through. Kept mostly
+     opaque so dense components (feature table) stay legible. */
+  --calcite-color-background: rgba(13, 15, 20, 0.35);
+  --calcite-color-foreground-1: rgba(18, 22, 30, 0.72);
+  --calcite-color-foreground-2: rgba(255, 255, 255, 0.08);
+  --calcite-color-foreground-3: rgba(255, 255, 255, 0.14);
+
+  /* Text: brighter than the first pass — labels were reading too dim. */
+  --calcite-color-text-1: #eaf2ff;
+  --calcite-color-text-2: #c2cede;
+  --calcite-color-text-3: #93a2b6;
+
+  /* Borders: subtle light hairlines matching our panels. */
+  --calcite-color-border-1: rgba(255, 255, 255, 0.16);
+  --calcite-color-border-2: rgba(255, 255, 255, 0.11);
+  --calcite-color-border-3: rgba(255, 255, 255, 0.07);
+
+  --calcite-ui-icon-color: currentColor;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: "Outfit", system-ui, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  overflow: hidden;
+  background-image: linear-gradient(
+      to bottom,
+      rgba(13, 15, 20, 0.78),
+      rgba(13, 15, 20, 0.9)
+    ),
+    radial-gradient(circle at 15% 40%, rgba(0, 229, 255, 0.12), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.12), transparent 45%),
+    url("/bg-map.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* ------------------------------------------------------------------ *
+ * App shell layout
+ * ------------------------------------------------------------------ */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.map-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ------------------------------------------------------------------ *
+ * Header
+ * ------------------------------------------------------------------ */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  height: var(--header-height);
+  padding: 0 1.5rem;
+  background: var(--panel-bg-solid);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--panel-border);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.45),
+    inset 0 -1px 0 rgba(0, 229, 255, 0.15);
+  z-index: 20;
+  position: relative;
+}
+
+.app-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 229, 255, 0.5),
+    rgba(14, 165, 233, 0.4),
+    transparent
+  );
+}
+
+.app-header__logo {
+  height: 56px;
+  width: 56px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgba(0, 229, 255, 0.5));
+  flex: 0 0 auto;
+}
+
+.app-header__titles {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.app-header__title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  background: linear-gradient(to right, #ffffff, var(--accent-cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+}
+
+.app-header__subtitle {
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-header__spacer {
+  flex: 1 1 auto;
+}
+
+/* Status pill (System Online) */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(52, 211, 153, 0.1);
+  color: var(--accent-emerald);
+  padding: 0.5rem 1.1rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.18);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.pulse-dot {
+  width: 9px;
+  height: 9px;
+  background: var(--accent-emerald);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--accent-emerald);
+  animation: pulse-green 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pulse-green {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 12px var(--accent-emerald);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.4);
+    box-shadow: 0 0 24px var(--accent-emerald);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 12px var(--accent-emerald);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Reusable frosted-glass panel (used by widget containers)
+ * ------------------------------------------------------------------ */
+.glass-panel {
+  background: var(--panel-bg-solid);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glow);
+  color: var(--text-main);
+}
+
+/* ------------------------------------------------------------------ *
+ * Responsive
+ * ------------------------------------------------------------------ */
+@media (max-width: 640px) {
+  :root {
+    --header-height: 72px;
+  }
+  .app-header {
+    gap: 0.75rem;
+    padding: 0 0.85rem;
+  }
+  .app-header__logo {
+    height: 44px;
+    width: 44px;
+  }
+  .app-header__title {
+    font-size: 1.05rem;
+    white-space: normal;
+  }
+  .app-header__subtitle {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+  }
+  .status-indicator {
+    display: none;
+  }
+}

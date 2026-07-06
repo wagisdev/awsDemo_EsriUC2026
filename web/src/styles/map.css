@@ -1,0 +1,462 @@
+/* ------------------------------------------------------------------ *
+ * Map stage + ArcGIS view container
+ * ------------------------------------------------------------------ */
+.map-view {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/* Loading veil shown until the view + layers are ready. */
+.map-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: rgba(13, 15, 20, 0.55);
+  backdrop-filter: blur(6px);
+  z-index: 30;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.map-loading__spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 229, 255, 0.15);
+  border-top-color: var(--accent-cyan);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * ArcGIS widget + Calcite chrome — retint to frosted glass
+ * ------------------------------------------------------------------ */
+.esri-widget,
+.esri-component {
+  background: transparent;
+  color: var(--text-main);
+  font-family: "Outfit", system-ui, sans-serif;
+}
+
+.esri-widget--button {
+  background: var(--panel-bg-solid);
+  color: var(--text-main);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.esri-widget--button:hover {
+  background: rgba(0, 229, 255, 0.12);
+  color: #ffffff;
+}
+
+.esri-popup__main-container,
+.esri-widget.esri-expand__content {
+  background: var(--panel-bg-solid);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+}
+
+/* Custom floating widget panels (React-owned) */
+.widget-dock {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  z-index: 15;
+  max-height: calc(100% - 2rem);
+}
+
+.widget-panel {
+  width: 320px;
+  max-width: min(92vw, 360px);
+  max-height: calc(100vh - var(--header-height) - 2rem);
+  overflow: auto;
+  padding: 1rem 1.15rem 1.25rem;
+  animation: panel-in 0.18s ease;
+}
+
+/* Wider panel for the basemap gallery: its content area must exceed ~350px so
+   the component's container-query grid switches from a single column to a
+   multi-column card layout (2 columns of thumbnail cards at this width). */
+.widget-panel--wide {
+  width: 410px;
+  max-width: min(94vw, 440px);
+}
+
+.widget-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.widget-panel__title {
+  color: var(--accent-cyan);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.coordinate-readout {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  z-index: 15;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+}
+
+/* ------------------------------------------------------------------ *
+ * Widget toolbar (vertical rail of buttons, top-right)
+ * ------------------------------------------------------------------ */
+.widget-toolbar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 16;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  border-radius: var(--radius-md);
+  /* Never let the rail exceed the viewport (many tools / short windows). */
+  max-height: calc(100vh - var(--header-height) - 2rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.widget-toolbar__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.widget-toolbar__btn:hover {
+  background: rgba(0, 229, 255, 0.1);
+  color: var(--text-main);
+}
+
+.widget-toolbar__btn.is-active {
+  background: rgba(0, 229, 255, 0.16);
+  border-color: rgba(0, 229, 255, 0.5);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.25);
+}
+
+/* Active widget panel(s) sit to the left of the toolbar. */
+.widget-dock {
+  position: absolute;
+  top: 1rem;
+  right: calc(1rem + 42px + 0.8rem);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ------------------------------------------------------------------ *
+ * Generic controls inside widget panels
+ * ------------------------------------------------------------------ */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.icon-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+.field > label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+}
+
+.control,
+.widget-panel select,
+.widget-panel input[type="text"],
+.widget-panel input[type="number"] {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--panel-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  background: rgba(0, 229, 255, 0.12);
+  color: var(--accent-cyan);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn:hover {
+  background: rgba(0, 229, 255, 0.22);
+}
+.btn.btn--ghost {
+  border-color: var(--panel-border);
+  background: transparent;
+  color: var(--text-muted);
+}
+.btn.btn--ghost:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.06);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.segmented button {
+  flex: 1;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.segmented button.is-active {
+  background: rgba(0, 229, 255, 0.16);
+  color: var(--accent-cyan);
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.result-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.result-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  padding: 0.4rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+}
+.result-list li .value {
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-cyan);
+}
+
+/* Host containers for embedded SDK widgets inside panels. */
+.esri-host {
+  width: 100%;
+}
+/* Map-components render as custom elements; make them fill the panel width. */
+.esri-host arcgis-layer-list,
+.esri-host arcgis-basemap-gallery,
+.esri-host arcgis-coordinate-conversion,
+.esri-host arcgis-distance-measurement-2d,
+.esri-host arcgis-area-measurement-2d,
+.esri-host arcgis-sketch,
+.esri-host arcgis-feature-table {
+  display: block;
+  width: 100%;
+  background: transparent;
+}
+
+/* FeatureTable needs explicit height. */
+.table-host {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  height: 38vh;
+  z-index: 14;
+  overflow: hidden;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Let the feature-table component fill the dock below the header. */
+.table-host .esri-host {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.table-host arcgis-feature-table {
+  display: block;
+  height: 100%;
+}
+
+/* ------------------------------------------------------------------ *
+ * ArcGIS + Calcite widget theming -> frosted glass / cyan
+ * Scoped to the map stage so SDK widgets inherit our palette.
+ * ------------------------------------------------------------------ */
+/* Calcite tokens for map-components live in theme.css (body.calcite-mode-dark),
+ * set high enough in the tree to also reach portaled menus/tooltips. */
+
+/* On-map default widgets (zoom, attribution, etc.) */
+.esri-ui .esri-widget,
+.esri-ui .esri-widget--button {
+  background: var(--panel-bg-solid);
+  color: var(--text-main);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+.esri-ui .esri-widget--button:hover {
+  background: rgba(0, 229, 255, 0.14);
+  color: #ffffff;
+}
+.esri-attribution {
+  background: rgba(13, 15, 20, 0.55) !important;
+  color: var(--text-muted) !important;
+}
+
+/* NOTE: map-components render in shadow DOM and are themed via calcite tokens
+ * (body.calcite-mode-dark in theme.css) + the per-widget layout rules above —
+ * not via .esri-* class selectors, which no longer match anything here. */
+
+/* Popups */
+.esri-popup__main-container,
+.esri-popup__header,
+.esri-popup__content {
+  background: var(--panel-bg-solid);
+  color: var(--text-main);
+}
+.esri-popup__button {
+  color: var(--accent-cyan);
+}
+
+/* ------------------------------------------------------------------ *
+ * Mobile / small screens
+ * The vertical right-rail + right-docked panels don't fit narrow phones,
+ * so: put the tool rail as a horizontal scrolling strip across the top,
+ * and float the active panel (and the attribute table) as a full-width
+ * bottom sheet. Touch targets stay 42px.
+ * ------------------------------------------------------------------ */
+@media (max-width: 640px) {
+  .widget-toolbar {
+    flex-direction: row;
+    top: 0.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .widget-toolbar__btn {
+    flex: 0 0 auto; /* keep size; the row scrolls horizontally */
+  }
+
+  /* Active widget panel -> full-width bottom sheet, clear of the top rail. */
+  .widget-dock {
+    top: auto;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
+  }
+  .widget-panel,
+  .widget-panel--wide {
+    width: 100%;
+    max-width: none;
+    max-height: 58vh;
+  }
+
+  /* Attribute table -> full-width bottom sheet too. */
+  .table-host {
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    height: 58vh;
+  }
+
+  /* The always-on coordinate readout would sit under the bottom sheet. */
+  .coordinate-readout {
+    display: none;
+  }
+}

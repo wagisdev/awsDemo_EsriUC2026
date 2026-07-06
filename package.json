@@ -1,0 +1,33 @@
+{
+  "name": "pormanes-gis-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pormanes.NET network-plan map viewer — secure ArcGIS map application on AWS edge (Esri UC 2026 demo).",
+  "type": "module",
+  "workspaces": [
+    "web",
+    "infra",
+    "edge"
+  ],
+  "scripts": {
+    "build:web": "npm run build --workspace web",
+    "build:edge": "npm run build --workspace edge",
+    "build:infra": "npm run build --workspace infra",
+    "build": "npm run build:edge && npm run build:web && npm run build:infra",
+    "test": "npm run test --workspace web && npm run test --workspace edge",
+    "lint": "eslint .",
+    "synth": "npm run synth --workspace infra",
+    "deploy": "npm run deploy --workspace infra"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "typescript-eslint": "^8.62.1"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "@pormanes/edge",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Lambda@Edge ArcGIS token injector for the /arcgis-proxy/* CloudFront behavior.",
+  "type": "commonjs",
+  "main": "dist/handler.js",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "npm run typecheck && esbuild src/handler.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/handler.js --external:@aws-sdk/*",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^22.10.0",
+    "esbuild": "^0.28.0",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.700.0"
+  }
+}

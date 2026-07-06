@@ -1,0 +1,28 @@
+{
+  "name": "@pormanes/infra",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AWS CDK infrastructure for the Pormanes.NET map viewer (S3+OAC, CloudFront, WAF, Lambda@Edge, Secrets Manager, ACM).",
+  "type": "commonjs",
+  "bin": {
+    "infra": "bin/app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy --all",
+    "diff": "cdk diff",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "aws-cdk": "^2.1129.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.261.0",
+    "constructs": "^10.4.2"
+  }
+}
