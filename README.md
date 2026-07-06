@@ -4,6 +4,10 @@ A secure, single-page map viewer of Pormanes.NET's internet network — currentl
 deployed and planned build-out — for Brgy. San Isidro, Almagro Island, Western
 Samar, Philippines.
 
+Total Development Cost -- Kiro Pro+ $40/month (~1,200 credits used)
+Total Development Time -- 3.25 hours
+Requirements -- [docs/PROMPT.md](docs/PROMPT.md) — Kiro Design Prompt
+
 The browser holds **no ArcGIS token, secret, or API key**. All ArcGIS traffic is
 proxied through the app's own origin, where a Lambda@Edge function attaches a
 short-lived token. Credentials stay off the client, Esri metering stays accurate,
